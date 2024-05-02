@@ -36,7 +36,7 @@ const userModuleLog = logger.getLogger('user_module');
 const paymentModuleLog = logger.getLogger('payment_module');
 
 //creates user_module_YYYY_MM_DD.log file and add this log
-userModuleLog.info('User has been created successfully.', "user"); 
+userModuleLog.info('User has been created successfully.', "System User", { id:"abc125", role: "admin" }, { sTag: ["user"] }); 
 //creates payment_module_YYYY_MM_DD.log file and add this log
-paymentModuleLog.error('payment of user failed.',"payment"); 
+paymentModuleLog.error('payment of user failed.',{ sTag: ["payment","failed"] }); 
 ```

@@ -29,25 +29,47 @@ class Logger {
   getFormat(fileName) {
     if (this.formatType === "tab") {
       return winston.format.printf(({ level, message, timestamp, ...meta }) => {
-        let metaData = "";
-        let tags = meta[Symbol.for("splat")];
-        if (tags && tags.length > 0) {
-          metaData = tags.join();
-        }
         if (typeof message == "object") {
           message = JSON.stringify(message);
+        };
+        let metaData = "";
+        let tags = meta[Symbol.for("splat")];
+        if (tags && !!tags.length) {
+          const option = tags.pop();
+          if (option && Object.keys(option).length === 1 && !!option?.sTag) {
+            metaData = option?.sTag?.join();
+          } else {
+            tags.push(option);
+          };
+          tags.forEach((function (tag) {
+            if (typeof tag !== 'string') {
+              tag = JSON.stringify(tag);
+            };
+            message += ` ${tag}`;
+          }))
         }
         return `${timestamp}\t${fileName}\t${level}\t${message}\t${metaData}`;
       });
     } else {
       return winston.format.printf(({ level, message, timestamp, ...meta }) => {
-        let metaData = "";
-        let tags = meta[Symbol.for("splat")];
-        if (tags && tags.length > 0) {
-          metaData = tags.join();
-        }
         if (typeof message == "object") {
           message = JSON.stringify(message);
+        };
+        let metaData = "";
+        let tags = meta[Symbol.for("splat")];
+        if (tags && !!tags.length) {
+          const option = tags.pop();
+          if (option && Object.keys(option).length === 1 && !!option?.sTag) {
+            metaData = option?.sTag?.join();
+          } else {
+            tags.push(option);
+          };
+          tags.forEach((function (tag) {
+            if (typeof tag !== 'string') {
+              tag = JSON.stringify(tag);
+            };
+            message += ` ${tag}`;
+          }))
         }
         return `${timestamp} : ${level} : ${message} : ${metaData}`;
       });
@@ -70,7 +92,7 @@ class Logger {
   }
 
   getLogger(fileName) {
-    let logTransporter = [...this.transporters,this.fileTransport(fileName)];
+    let logTransporter = [...this.transporters, this.fileTransport(fileName)];
     return winston.createLogger({
       format: this.format(fileName),
       transports: logTransporter,
