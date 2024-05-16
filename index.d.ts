@@ -1,9 +1,9 @@
-import winston from "winston";
-import DailyRotateFile from "winston-daily-rotate-file";
+import winston from 'winston';
+import DailyRotateFile from 'winston-daily-rotate-file';
 
 class Logger {
   constructor() {
-    this.logDir = "logs";
+    this.logDir = 'logs';
     this.fileSize = null;
     this.formatType = null;
     this.transporters = [];
@@ -27,13 +27,13 @@ class Logger {
   }
 
   getFormat(fileName) {
-    if (this.formatType === "tab") {
+    if (this.formatType === 'tab') {
       return winston.format.printf(({ level, message, timestamp, ...meta }) => {
-        if (typeof message === "object") {
+        if (typeof message === 'object') {
           message = JSON.stringify(message);
         }
-        let metaData = "";
-        let tags = meta[Symbol.for("splat")];
+        let metaData = '';
+        let tags = meta[Symbol.for('splat')];
         if (tags && !!tags.length) {
           const option = tags.pop();
           if (option && Object.keys(option).length === 1 && !!option?.sTag) {
@@ -48,15 +48,27 @@ class Logger {
             message += ` ${tag}`;
           });
         }
-        return `${timestamp}\t${fileName}\t${level}\t${message}\t${metaData}`;
+        if (meta?.stack) {
+          message += `${meta?.stack}`;
+        }
+
+        if (!meta?.stack) {
+          tags?.map((obj) => {
+            if (obj instanceof Error) {
+              message += ` ${obj.stack}`;
+            }
+          });
+        }
+
+        return `${timestamp}\t${fileName}\t${level}\t'${message}'\t${metaData}`;
       });
     } else {
       return winston.format.printf(({ level, message, timestamp, ...meta }) => {
-        if (typeof message === "object") {
+        if (typeof message === 'object') {
           message = JSON.stringify(message);
         }
-        let metaData = "";
-        let tags = meta[Symbol.for("splat")];
+        let metaData = '';
+        let tags = meta[Symbol.for('splat')];
         if (tags && !!tags.length) {
           const option = tags.pop();
           if (option && Object.keys(option).length === 1 && !!option?.sTag) {
@@ -71,7 +83,12 @@ class Logger {
             message += ` ${tag}`;
           });
         }
-        return `${timestamp} : ${level} : ${message} : ${metaData}`;
+
+        if (meta?.stack) {
+          message += ` ${meta?.stack}`;
+        }
+
+        return `${timestamp} : ${level} : '${message}' : ${metaData}`;
       });
     }
   }
@@ -79,6 +96,7 @@ class Logger {
   format(fileName) {
     return winston.format.combine(
       winston.format.timestamp(),
+      winston.format.errors({}),
       this.getFormat(fileName)
     );
   }
@@ -86,7 +104,7 @@ class Logger {
   fileTransport(label) {
     return new DailyRotateFile({
       filename: `${this.logDir}/${label}_%DATE%.log`,
-      datePattern: "YYYY_MM_DD",
+      datePattern: 'YYYY_MM_DD',
       maxSize: this.fileSize,
     });
   }
@@ -100,5 +118,4 @@ class Logger {
   }
 }
 
-// Exporting the Logger class as a module
 export default Logger;

@@ -48,7 +48,19 @@ class Logger {
             message += ` ${tag}`;
           }))
         }
-        return `${timestamp}\t${fileName}\t${level}\t${message}\t${metaData}`;
+        if (meta?.stack) {
+          message += `${meta?.stack}`;
+        }
+                
+        if (!meta?.stack) {
+          tags?.map(obj => {
+            if (obj instanceof Error) {
+              message += ` ${obj.stack}`
+            }
+          })
+        }
+
+        return `${timestamp}\t${fileName}\t${level}\t'${message}'\t${metaData}`;
       });
     } else {
       return winston.format.printf(({ level, message, timestamp, ...meta }) => {
@@ -71,7 +83,12 @@ class Logger {
             message += ` ${tag}`;
           }))
         }
-        return `${timestamp} : ${level} : ${message} : ${metaData}`;
+
+        if (meta?.stack) {
+          message += ` ${meta?.stack}`;
+        }
+
+        return `${timestamp} : ${level} : '${message}' : ${metaData}`;
       });
     }
   }
@@ -79,6 +96,7 @@ class Logger {
   format(fileName) {
     return winston.format.combine(
       winston.format.timestamp(),
+      winston.format.errors({}),
       this.getFormat(fileName)
     );
   }
