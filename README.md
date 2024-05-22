@@ -25,7 +25,7 @@ logger.setLogDir('logs');
 logger.setSize('5m'); 
 
 //set log formate type
-logger.setFormateType('tab');
+logger.setFormatType('tab');
 
 //add console transporter, it will console each log
 logger.transporter([new winston.transports.Console({})])

@@ -26,6 +26,10 @@ class Logger {
     this.formatType = type;
   }
 
+  setFormatType(type) {
+    this.formatType = type;
+  }
+
   getFormat(fileName) {
     if (this.formatType === 'tab') {
       return winston.format.printf(({ level, message, timestamp, ...meta }) => {
@@ -106,6 +110,7 @@ class Logger {
       filename: `${this.logDir}/${label}_%DATE%.log`,
       datePattern: 'YYYY_MM_DD',
       maxSize: this.fileSize,
+      utc: true
     });
   }
 
