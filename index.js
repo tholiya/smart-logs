@@ -4,6 +4,7 @@ const DailyRotateFile = require("winston-daily-rotate-file");
 class Logger {
   constructor() {
     this.logDir = "logs";
+    this.sep = "'";
     this.fileSize = null;
     this.formatType = null;
     this.transporters = [];
@@ -16,6 +17,10 @@ class Logger {
 
   setLogDir(dir) {
     this.logDir = dir;
+  }
+
+  setSep() {
+    this.sep = "\`";
   }
 
   setSize(size) {
@@ -64,7 +69,7 @@ class Logger {
           })
         }
 
-        return `${timestamp}\t${fileName}\t${level}\t'${message}'\t${metaData}`;
+        return `${timestamp}\t${fileName}\t${level}\t${this.sep}${message}${this.sep}\t${metaData}`;
       });
     } else {
       return winston.format.printf(({ level, message, timestamp, ...meta }) => {
