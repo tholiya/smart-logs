@@ -1,6 +1,6 @@
 {
   "name": "smart-logs",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "**smart-logs** is used to create multiple files based on label, base of this package is [winston](https://www.npmjs.com/package/winston)",
   "main": "index.js",
   "types": "./index.d.ts",

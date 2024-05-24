@@ -100,7 +100,7 @@ class Logger {
   format(fileName) {
     return winston.format.combine(
       winston.format.timestamp(),
-      winston.format.errors({}),
+      winston.format.errors({stack: true}),
       this.getFormat(fileName)
     );
   }
