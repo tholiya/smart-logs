@@ -97,9 +97,39 @@ class Logger {
     }
   }
 
+  formatRFC3339Nano() {
+    const date = new Date();
+    const pad = (num, size) => String(num).padStart(size, '0');
+  
+    // Get milliseconds
+    const ms = date.getMilliseconds();
+  
+    // Get high-resolution time using performance.now()
+    const hrTime = process.hrtime();
+  
+    // Calculate the total nanoseconds (milliseconds + microseconds + additional nanoseconds)
+    const millisecondsAsNs = ms * 1_000_000; // convert milliseconds to nanoseconds
+    const additionalNanoseconds = hrTime[1];
+    const totalNanoseconds = millisecondsAsNs + additionalNanoseconds;
+    const nanosecondsStr = pad(totalNanoseconds, 9).slice(0, 9);
+  
+    const year = date.getUTCFullYear();
+    const month = pad(date.getUTCMonth() + 1, 2);
+    const day = pad(date.getUTCDate(), 2);
+    const hours = pad(date.getUTCHours(), 2);
+    const minutes = pad(date.getUTCMinutes(), 2);
+    const seconds = pad(date.getUTCSeconds(), 2);
+  
+    return `${year}-${month}-${day}T${hours}:${minutes}:${seconds}.${nanosecondsStr}Z`;
+  }
+
   format(fileName) {
     return winston.format.combine(
-      winston.format.timestamp(),
+      winston.format.timestamp({
+        format: () =>{
+          return this.formatRFC3339Nano()
+        }
+      }),
       winston.format.errors({stack: true}),
       this.getFormat(fileName)
     );
